@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Socratic DSA Tutor - Binary Search Studio</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@500,700&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem;
+      --color-bg: #f7f6f2; --color-surface: #f9f8f5; --color-surface-2: #fbfbf9; --color-surface-offset: #f3f0ec; --color-border: #d4d1ca; --color-divider: #dcd9d5;
+      --color-text: #28251d; --color-text-muted: #67655f; --color-text-faint: #9c9a94; --color-text-inverse: #f9f8f4;
+      --color-primary: #01696f; --color-primary-hover: #0c4e54; --color-primary-highlight: #d8e7e6;
+      --color-success: #437a22; --color-success-highlight: #dce7d3;
+      --color-warning: #b36a23; --color-warning-highlight: #efe0d3;
+      --color-error: #a12c7b; --color-error-highlight: #efd9e5;
+      --color-blue: #006494; --color-blue-highlight: #d7e7ef;
+      --shadow-sm: 0 1px 2px oklch(0.2 0.01 80 / 0.06);
+      --shadow-md: 0 10px 30px oklch(0.2 0.01 80 / 0.10);
+      --shadow-lg: 0 18px 60px oklch(0.2 0.01 80 / 0.14);
+      --radius-sm: 0.5rem; --radius-md: 0.85rem; --radius-lg: 1.25rem; --radius-xl: 1.75rem; --radius-full: 999px;
+      --font-body: 'Satoshi', 'Inter', sans-serif;
+      --font-display: 'Cabinet Grotesk', 'Satoshi', sans-serif;
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      --container: 1260px;
+    }
+    [data-theme="dark"] {
+      --color-bg: #171614; --color-surface: #1c1b19; --color-surface-2: #201f1d; --color-surface-offset: #262422; --color-border: #393836; --color-divider: #2a2927;
+      --color-text: #e5e2dc; --color-text-muted: #a6a39b; --color-text-faint: #76736d; --color-text-inverse: #1e1c1a;
+      --color-primary: #63aab3; --color-primary-hover: #7bbec6; --color-primary-highlight: #243337;
+      --color-success: #8bbc61; --color-success-highlight: #283423;
+      --color-warning: #f3b167; --color-warning-highlight: #3b2e22;
+      --color-error: #dd78b2; --color-error-highlight: #392731;
+      --color-blue: #7bb4e0; --color-blue-highlight: #22303b;
+      --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.20);
+      --shadow-md: 0 12px 32px oklch(0 0 0 / 0.34);
+      --shadow-lg: 0 24px 70px oklch(0 0 0 / 0.45);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-font-smoothing:antialiased;text-size-adjust:none;scroll-behavior:smooth}
+    body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);line-height:1.6;background:radial-gradient(circle at top, color-mix(in oklab, var(--color-primary) 10%, transparent), transparent 32%), var(--color-bg);color:var(--color-text)}
+    button,input,textarea{font:inherit;color:inherit}
+    button{cursor:pointer;border:none;background:none}
+    img,svg{display:block;max-width:100%}
+    :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .shell{max-width:var(--container);margin:0 auto;padding:var(--space-6)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);margin-bottom:var(--space-6)}
+    .brand{display:flex;align-items:center;gap:var(--space-3)}
+    .logo{width:2.6rem;height:2.6rem;border-radius:0.9rem;background:linear-gradient(135deg,var(--color-primary),color-mix(in oklab,var(--color-primary) 60%, var(--color-blue)));display:grid;place-items:center;box-shadow:var(--shadow-sm);color:white}
+    .logo svg{width:1.4rem;height:1.4rem}
+    .brand h1{font-family:var(--font-display);font-size:var(--text-xl);line-height:1.05;letter-spacing:-0.03em}
+    .brand p{font-size:var(--text-sm);color:var(--color-text-muted)}
+    .top-actions{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap}
+    .icon-btn,.chip,.action-btn{min-height:44px;border-radius:var(--radius-full);display:inline-flex;align-items:center;justify-content:center;transition:all var(--transition)}
+    .icon-btn{width:44px;border:1px solid color-mix(in oklab, var(--color-text) 12%, transparent);background:var(--color-surface)}
+    .icon-btn:hover{background:var(--color-surface-offset)}
+    .chip{padding:0 var(--space-4);background:var(--color-surface);border:1px solid color-mix(in oklab, var(--color-text) 12%, transparent);font-size:var(--text-sm);color:var(--color-text-muted)}
+    .grid{display:grid;grid-template-columns:1.15fr 0.95fr;gap:var(--space-6)}
+    .panel{background:color-mix(in oklab, var(--color-surface) 82%, transparent);border:1px solid color-mix(in oklab, var(--color-text) 11%, transparent);border-radius:var(--radius-xl);box-shadow:var(--shadow-md);backdrop-filter:blur(12px)}
+    .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-4);padding:var(--space-6);border-bottom:1px solid var(--color-divider)}
+    .panel-head h2{font-size:var(--text-lg);line-height:1.15}
+    .panel-head p{font-size:var(--text-sm);color:var(--color-text-muted);max-width:46ch}
+    .chat-wrap{display:grid;grid-template-rows:auto 1fr auto;min-height:780px}
+    .chat-log{padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);overflow:auto;max-height:100%}
+    .message{display:grid;gap:var(--space-2);padding:var(--space-4);border-radius:var(--radius-lg);border:1px solid color-mix(in oklab, var(--color-text) 8%, transparent);max-width:92%;animation:rise .35s ease}
+    .message .role{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.12em;color:var(--color-text-muted);font-weight:700}
+    .message .body{font-size:var(--text-sm)}
+    .message.tutor{background:color-mix(in oklab,var(--color-blue-highlight) 75%, var(--color-surface));justify-self:start}
+    .message.student{background:color-mix(in oklab,var(--color-primary-highlight) 72%, var(--color-surface));justify-self:end}
+    .message.error{background:color-mix(in oklab,var(--color-error-highlight) 78%, var(--color-surface));border-color:color-mix(in oklab, var(--color-error) 28%, transparent)}
+    .message.success{background:color-mix(in oklab,var(--color-success-highlight) 78%, var(--color-surface));border-color:color-mix(in oklab, var(--color-success) 25%, transparent)}
+    .composer{padding:var(--space-5) var(--space-6) var(--space-6);display:grid;gap:var(--space-4);border-top:1px solid var(--color-divider)}
+    .quick-replies{display:flex;gap:var(--space-3);flex-wrap:wrap}
+    .reply{padding:0.7rem 1rem;border-radius:var(--radius-full);border:1px solid color-mix(in oklab, var(--color-text) 12%, transparent);background:var(--color-surface-2);font-size:var(--text-sm)}
+    .reply:hover{border-color:color-mix(in oklab, var(--color-primary) 35%, transparent);background:var(--color-primary-highlight)}
+    .input-row{display:grid;grid-template-columns:1fr auto auto;gap:var(--space-3)}
+    .input{min-height:52px;border-radius:var(--radius-lg);border:1px solid color-mix(in oklab, var(--color-text) 12%, transparent);background:var(--color-surface-2);padding:0 var(--space-4)}
+    .action-btn{padding:0 var(--space-5);font-weight:700}
+    .primary{background:var(--color-primary);color:var(--color-text-inverse)}
+    .primary:hover{background:var(--color-primary-hover)}
+    .secondary{background:var(--color-surface-2);border:1px solid color-mix(in oklab, var(--color-text) 12%, transparent)}
+    .viz-wrap{padding:var(--space-6);display:grid;gap:var(--space-5)}
+    .hero-card{display:grid;grid-template-columns:1.1fr auto;gap:var(--space-4);padding:var(--space-5);border-radius:var(--radius-lg);background:linear-gradient(135deg,color-mix(in oklab,var(--color-primary) 18%, var(--color-surface)), var(--color-surface-2));border:1px solid color-mix(in oklab, var(--color-primary) 18%, transparent)}
+    .hero-card h3{font-size:var(--text-lg);line-height:1.12}
+    .hero-card p{font-size:var(--text-sm);color:var(--color-text-muted);max-width:36ch}
+    .stage-badge{align-self:start;padding:0.65rem 0.95rem;border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:var(--color-surface);border:1px solid color-mix(in oklab, var(--color-text) 12%, transparent)}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3)}
+    .stat{padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface-2);border:1px solid color-mix(in oklab, var(--color-text) 10%, transparent)}
+    .stat .label{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.12em;color:var(--color-text-muted)}
+    .stat .value{font-size:var(--text-lg);font-weight:700;font-variant-numeric:tabular-nums lining-nums}
+    .array-board{padding:var(--space-5);border-radius:var(--radius-lg);background:var(--color-surface-2);border:1px solid color-mix(in oklab, var(--color-text) 10%, transparent)}
+    .index-row,.array-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--space-3)}
+    .index-row{margin-bottom:var(--space-3)}
+    .index{font-size:var(--text-xs);text-align:center;color:var(--color-text-muted);font-variant-numeric:tabular-nums}
+    .cell{min-height:88px;border-radius:1rem;display:grid;place-items:center;background:var(--color-surface);border:1px solid color-mix(in oklab, var(--color-text) 10%, transparent);position:relative;overflow:hidden;transition:transform var(--transition),background var(--transition),border-color var(--transition),box-shadow var(--transition)}
+    .cell span{font-size:var(--text-lg);font-weight:700;font-variant-numeric:tabular-nums lining-nums;position:relative;z-index:1}
+    .cell small{position:absolute;bottom:10px;font-size:var(--text-xs);color:var(--color-text-muted)}
+    .cell::after{content:"";position:absolute;inset:auto 0 0 0;height:0.25rem;background:transparent;transition:all var(--transition)}
+    .cell.active{transform:translateY(-4px);border-color:color-mix(in oklab, var(--color-warning) 35%, transparent);background:color-mix(in oklab, var(--color-warning-highlight) 80%, var(--color-surface));box-shadow:var(--shadow-sm)}
+    .cell.active::after{background:var(--color-warning)}
+    .cell.found{border-color:color-mix(in oklab, var(--color-success) 35%, transparent);background:color-mix(in oklab, var(--color-success-highlight) 82%, var(--color-surface))}
+    .cell.found::after{background:var(--color-success)}
+    .cell.eliminated{opacity:0.42;transform:scale(0.97);filter:saturate(0.75)}
+    .range-bar{position:relative;height:14px;border-radius:var(--radius-full);background:var(--color-surface-offset);overflow:hidden;border:1px solid color-mix(in oklab, var(--color-text) 10%, transparent)}
+    .range-window{position:absolute;top:0;bottom:0;border-radius:var(--radius-full);background:linear-gradient(90deg,var(--color-primary),color-mix(in oklab,var(--color-primary) 45%, var(--color-blue)));transition:all .35s ease}
+    .pointer-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--space-3);font-size:var(--text-xs);color:var(--color-text-muted);font-weight:700;min-height:20px}
+    .pointer-strip div{text-align:center}
+    .timeline,.code-panel,.notes{padding:var(--space-5);border-radius:var(--radius-lg);background:var(--color-surface-2);border:1px solid color-mix(in oklab, var(--color-text) 10%, transparent)}
+    .timeline{display:grid;gap:var(--space-3)}
+    .step{display:grid;grid-template-columns:auto 1fr;gap:var(--space-3);align-items:start}
+    .dot{width:0.8rem;height:0.8rem;border-radius:50%;background:var(--color-divider);margin-top:0.45rem}
+    .step.done .dot{background:var(--color-success)}
+    .step.current .dot{background:var(--color-warning)}
+    .step p{font-size:var(--text-sm);color:var(--color-text-muted)}
+    .complexity{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-4);border-radius:var(--radius-lg);background:linear-gradient(135deg,color-mix(in oklab,var(--color-error-highlight) 55%, var(--color-surface)), var(--color-surface));border:1px solid color-mix(in oklab, var(--color-text) 10%, transparent)}
+    .pill{padding:0.55rem 0.9rem;border-radius:var(--radius-full);font-size:var(--text-sm);font-weight:700}
+    .pill.bad{background:var(--color-error-highlight);color:var(--color-error)}
+    .pill.good{background:var(--color-success-highlight);color:var(--color-success)}
+    pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.92rem;line-height:1.55;color:var(--color-text);font-variant-numeric:tabular-nums lining-nums}
+    .legend{display:flex;gap:var(--space-3);flex-wrap:wrap;font-size:var(--text-xs);color:var(--color-text-muted)}
+    .legend span{display:inline-flex;align-items:center;gap:0.4rem}
+    .legend i{width:0.75rem;height:0.75rem;border-radius:50%}
+    .footer-note{font-size:var(--text-sm);color:var(--color-text-muted)}
+    @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    @media (max-width: 1040px){.grid{grid-template-columns:1fr}.chat-wrap{min-height:unset}}
+    @media (max-width: 720px){
+      .shell{padding:var(--space-4)}
+      .topbar,.panel-head,.hero-card{grid-template-columns:1fr;display:grid}
+      .topbar{gap:var(--space-4)}
+      .top-actions{justify-content:flex-start}
+      .stats{grid-template-columns:1fr}
+      .input-row{grid-template-columns:1fr}
+      .array-row,.index-row,.pointer-strip{gap:var(--space-2)}
+      .cell{min-height:72px}
+    }
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 7.5 12 4l7 3.5-7 3.5-7-3.5Z"/>
+            <path d="M5 12.5 12 16l7-3.5"/>
+            <path d="M5 17 12 20l7-3"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Socratic DSA Tutor</h1>
+          <p>Binary Search Studio with guided probes, visual elimination, and clean complexity cues.</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="chip" id="patternChip">Pattern: Error → Probe → Relapse → Fix</div>
+        <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main" class="grid">
+      <section class="panel chat-wrap" aria-labelledby="chatTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="chatTitle">Guided conversation</h2>
+            <p>The tutor does not just give the answer. It nudges, challenges weak elimination logic, and rewards the correct binary-search invariant.</p>
+          </div>
+          <div class="chip" id="attemptChip">Attempt 0 of 3</div>
+        </div>
+
+        <div class="chat-log" id="chatLog" aria-live="polite"></div>
+
+        <div class="composer">
+          <div class="quick-replies" aria-label="Suggested replies">
+            <button class="reply" type="button" data-fill="I will search the right half only.">Right half only</button>
+            <button class="reply" type="button" data-fill="I compare with the middle and discard half based on the comparison.">Use middle comparison</button>
+            <button class="reply" type="button" data-fill="Keep low and high pointers, find mid, and halve the search space each step.">State the invariant</button>
+          </div>
+          <div class="input-row">
+            <input id="userInput" class="input" type="text" placeholder="Describe your binary search approach..." aria-label="Your binary search approach">
+            <button class="action-btn secondary" id="resetBtn" type="button">Reset</button>
+            <button class="action-btn primary" id="sendBtn" type="button">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="vizTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="vizTitle">Search visualizer</h2>
+            <p>Array: [1, 3, 5, 7, 9], target = 5. Watch the valid range shrink and see why binary search wins over linear scanning.</p>
+          </div>
+          <div class="chip" id="phaseChip">Stage: Setup</div>
+        </div>
+
+        <div class="viz-wrap">
+          <div class="hero-card">
+            <div>
+              <h3 id="coachText">Start with a strategy. The goal is not to guess the answer; it is to eliminate half the search space each time.</h3>
+              <p id="coachSub">A strong explanation should mention low, high, mid, and a comparison that preserves the sorted-array invariant.</p>
+            </div>
+            <div class="stage-badge" id="stageBadge">Setup</div>
+          </div>
+
+          <div class="stats">
+            <article class="stat">
+              <div class="label">Current range</div>
+              <div class="value" id="rangeText">0–4</div>
+            </article>
+            <article class="stat">
+              <div class="label">Mid index</div>
+              <div class="value" id="midText">2</div>
+            </article>
+            <article class="stat">
+              <div class="label">Elimination</div>
+              <div class="value" id="elimText">0%</div>
+            </article>
+          </div>
+
+          <div class="array-board">
+            <div class="index-row" id="indexRow"></div>
+            <div class="pointer-strip" id="pointerStrip"></div>
+            <div class="array-row" id="arrayVis"></div>
+            <div style="margin-top: var(--space-4); display:grid; gap:var(--space-3);">
+              <div class="range-bar" aria-label="Active search range"><div class="range-window" id="rangeWindow"></div></div>
+              <div class="legend">
+                <span><i style="background: var(--color-warning);"></i> Mid probe</span>
+                <span><i style="background: var(--color-success);"></i> Found target</span>
+                <span><i style="background: var(--color-divider);"></i> Eliminated region</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline" id="timeline"></div>
+
+          <div class="complexity">
+            <div>
+              <div class="label" style="font-size: var(--text-xs); text-transform:uppercase; letter-spacing:0.12em; color:var(--color-text-muted);">Time complexity</div>
+              <div id="complexityText" style="font-size: var(--text-lg); font-weight:700;">O(n) — not efficient yet</div>
+            </div>
+            <div class="pill bad" id="complexityPill">Needs fixing</div>
+          </div>
+
+          <div class="code-panel">
+            <div class="label" style="font-size: var(--text-xs); text-transform:uppercase; letter-spacing:0.12em; color:var(--color-text-muted); margin-bottom: var(--space-3);">Optimized code</div>
+            <pre id="codeBlock">// Unlock the final implementation by explaining the true binary-search pattern.</pre>
+          </div>
+
+          <div class="notes footer-note" id="noteBox">The current version is intentionally Socratic: it surfaces a bad idea first, then pushes the learner toward the invariant.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const state = {
+      stage: 0,
+      low: 0,
+      high: 4,
+      mid: 2,
+      targetIndex: 2,
+      array: [1,3,5,7,9],
+      messages: []
+    };
+
+    const stageMeta = [
+      {
+        badge: 'Setup',
+        phase: 'Stage: Setup',
+        coach: 'Start with a strategy. The goal is not to guess the answer; it is to eliminate half the search space each time.',
+        sub: 'A strong explanation should mention low, high, mid, and a comparison that preserves the sorted-array invariant.',
+        note: 'The current version is intentionally Socratic: it surfaces a bad idea first, then pushes the learner toward the invariant.'
+      },
+      {
+        badge: 'Error',
+        phase: 'Stage: Error',
+        coach: 'That approach finds the middle value, but the reasoning is weak. You did not explain the discard rule clearly.',
+        sub: 'Checking one side casually is not binary search. Sorted order matters only when you use it to eliminate half with logic.',
+        note: 'Probe 1 focuses on elimination quality, not just the fact that mid happens to be the target here.'
+      },
+      {
+        badge: 'Probe',
+        phase: 'Stage: Probe',
+        coach: 'Now identify the real pattern: compare arr[mid] with target, then keep only the half that can still contain the answer.',
+        sub: 'The invariant is that the target, if present, always remains inside [low, high].',
+        note: 'Probe 2 rewards the comparison idea and pushes the learner to phrase the invariant explicitly.'
+      },
+      {
+        badge: 'Fix',
+        phase: 'Stage: Fix',
+        coach: 'Perfect. This explanation preserves the invariant and halves the search space each step.',
+        sub: 'That is why binary search runs in O(log n), not O(n).',
+        note: 'The learner now sees both the visual elimination and the formal implementation.'
+      }
+    ];
+
+    const timelineSteps = [
+      'State the search space with low and high.',
+      'Probe the middle element.',
+      'Discard the impossible half.',
+      'Repeat until found or exhausted.'
+    ];
+
+    const codeText = `function binarySearch(arr, target) {
+  let low = 0;
+  let high = arr.length - 1;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+
+    if (arr[mid] === target) return mid;
+    if (arr[mid] < target) low = mid + 1;
+    else high = mid - 1;
+  }
+
+  return -1;
+}`;
+
+    const chatLog = document.getElementById('chatLog');
+    const arrayVis = document.getElementById('arrayVis');
+    const indexRow = document.getElementById('indexRow');
+    const pointerStrip = document.getElementById('pointerStrip');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const rangeWindow = document.getElementById('rangeWindow');
+    const timeline = document.getElementById('timeline');
+
+    function renderArray() {
+      indexRow.innerHTML = '';
+      pointerStrip.innerHTML = '';
+      arrayVis.innerHTML = '';
+
+      state.array.forEach((value, index) => {
+        const idx = document.createElement('div');
+        idx.className = 'index';
+        idx.textContent = `idx ${index}`;
+        indexRow.appendChild(idx);
+
+        const pointer = document.createElement('div');
+        const labels = [];
+        if (index === state.low) labels.push('low');
+        if (index === state.mid) labels.push('mid');
+        if (index === state.high) labels.push('high');
+        pointer.textContent = labels.join(' / ');
+        pointerStrip.appendChild(pointer);
+
+        const cell = document.createElement('div');
+        const eliminated = index < state.low || index > state.high;
+        cell.className = 'cell';
+        if (eliminated) cell.classList.add('eliminated');
+        if (state.stage >= 1 && index === state.mid) cell.classList.add('active');
+        if (state.stage === 3 && index === state.targetIndex) {
+          cell.classList.remove('active');
+          cell.classList.add('found');
+        }
+        cell.innerHTML = `<span>${value}</span><small>${index === state.targetIndex ? 'target' : ''}</small>`;
+        arrayVis.appendChild(cell);
+      });
+
+      const total = state.array.length;
+      const left = (state.low / total) * 100;
+      const width = ((state.high - state.low + 1) / total) * 100;
+      rangeWindow.style.left = `${left}%`;
+      rangeWindow.style.width = `${width}%`;
+    }
+
+    function renderTimeline() {
+      timeline.innerHTML = '';
+      timelineSteps.forEach((text, index) => {
+        const row = document.createElement('div');
+        row.className = 'step';
+        if (index < state.stage) row.classList.add('done');
+        if (index === state.stage && state.stage < 4) row.classList.add('current');
+        row.innerHTML = `<div class="dot"></div><div><strong>${text}</strong><p>${timelineCopy(index)}</p></div>`;
+        timeline.appendChild(row);
+      });
+    }
+
+    function timelineCopy(index) {
+      const copies = [
+        'We begin with the full sorted interval [0, 4].',
+        state.stage === 0 ? 'The next important move is to inspect the middle.' : 'Mid = 2, and arr[mid] = 5.',
+        state.stage < 2 ? 'A correct explanation must justify which half can be removed.' : 'Because arr[mid] equals the target here, the search stops immediately.',
+        state.stage < 3 ? 'Only the right invariant leads to logarithmic performance.' : 'The final implementation repeats this halving idea in a loop.'
+      ];
+      return copies[index];
+    }
+
+    function addMessage(text, type, roleLabel) {
+      const msg = document.createElement('div');
+      msg.className = `message ${type}`;
+      msg.innerHTML = `<div class="role">${roleLabel}</div><div class="body">${text}</div>`;
+      chatLog.appendChild(msg);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function updateMeta() {
+      const meta = stageMeta[state.stage];
+      document.getElementById('stageBadge').textContent = meta.badge;
+      document.getElementById('phaseChip').textContent = meta.phase;
+      document.getElementById('coachText').textContent = meta.coach;
+      document.getElementById('coachSub').textContent = meta.sub;
+      document.getElementById('noteBox').textContent = meta.note;
+      document.getElementById('attemptChip').textContent = `Attempt ${Math.min(state.stage, 3)} of 3`;
+      document.getElementById('rangeText').textContent = `${state.low}–${state.high}`;
+      document.getElementById('midText').textContent = String(state.mid);
+
+      if (state.stage === 0) {
+        document.getElementById('elimText').textContent = '0%';
+        document.getElementById('complexityText').textContent = 'O(n) — not efficient yet';
+        document.getElementById('complexityPill').textContent = 'Needs fixing';
+        document.getElementById('complexityPill').className = 'pill bad';
+        document.getElementById('codeBlock').textContent = '// Unlock the final implementation by explaining the true binary-search pattern.';
+      } else if (state.stage === 1) {
+        document.getElementById('elimText').textContent = '40%';
+        document.getElementById('complexityText').textContent = 'Weak logic — still feels linear';
+        document.getElementById('complexityPill').textContent = 'Poor elimination';
+        document.getElementById('complexityPill').className = 'pill bad';
+      } else if (state.stage === 2) {
+        document.getElementById('elimText').textContent = '50% idea';
+        document.getElementById('complexityText').textContent = 'Closer — invariant almost there';
+        document.getElementById('complexityPill').textContent = 'Near correct';
+        document.getElementById('complexityPill').className = 'pill';
+        document.getElementById('complexityPill').style.background = 'var(--color-warning-highlight)';
+        document.getElementById('complexityPill').style.color = 'var(--color-warning)';
+      } else {
+        document.getElementById('elimText').textContent = '100% match';
+        document.getElementById('complexityText').textContent = 'O(log n) — halves the search space';
+        const pill = document.getElementById('complexityPill');
+        pill.textContent = 'Optimized';
+        pill.className = 'pill good';
+        document.getElementById('codeBlock').textContent = codeText;
+      }
+    }
+
+    function tutorResponse() {
+      state.stage = Math.min(state.stage + 1, 3);
+      state.low = 0;
+      state.high = 4;
+      state.mid = 2;
+
+      if (state.stage === 1) {
+        addMessage('That answer jumps to a side without using the sorted-array invariant. Here, mid already equals 5, but your explanation still fails because it does not justify how half gets discarded.', 'error', 'Tutor');
+      } else if (state.stage === 2) {
+        addMessage('Better. Now say the exact rule: compare arr[mid] with target, then move low or high so the target stays inside the active interval.', 'tutor', 'Tutor');
+      } else {
+        addMessage('Excellent. Binary search keeps the target inside [low, high], checks the middle, and discards one impossible half each step. That is the reason for O(log n).', 'success', 'Tutor');
+      }
+
+      updateMeta();
+      renderArray();
+      renderTimeline();
+    }
+
+    function handleSend(prefill = null) {
+      const text = (prefill ?? userInput.value).trim();
+      if (!text) return;
+      addMessage(text, 'student', 'Student');
+      userInput.value = '';
+      sendBtn.disabled = true;
+      setTimeout(() => {
+        tutorResponse();
+        sendBtn.disabled = false;
+      }, 550);
+    }
+
+    function resetDemo() {
+      state.stage = 0;
+      state.low = 0;
+      state.high = 4;
+      state.mid = 2;
+      chatLog.innerHTML = '';
+      addMessage('Demo array: [1, 3, 5, 7, 9]. Find target = 5. Describe your binary search approach clearly.', 'tutor', 'Tutor');
+      updateMeta();
+      renderArray();
+      renderTimeline();
+    }
+
+    document.querySelectorAll('.reply').forEach(btn => btn.addEventListener('click', () => {
+      userInput.value = btn.dataset.fill;
+      userInput.focus();
+    }));
+
+    sendBtn.addEventListener('click', () => handleSend());
+    resetBtn.addEventListener('click', resetDemo);
+    userInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSend();
+    });
+
+    (function(){
+      const t=document.querySelector('[data-theme-toggle]');
+      const r=document.documentElement;
+      let d=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+      r.setAttribute('data-theme',d);
+      const updateIcon=()=>{t.setAttribute('aria-label','Switch to '+(d==='dark'?'light':'dark')+' mode');t.innerHTML=d==='dark'?'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>':'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'};
+      updateIcon();
+      t.addEventListener('click',()=>{d=d==='dark'?'light':'dark';r.setAttribute('data-theme',d);updateIcon();});
+    })();
+
+    resetDemo();
+  </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socratic DSA Tutor - Binary Search Demo</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 1000px; margin: 50px auto; background: #f5f5f5; }
+        .container { display: flex; gap: 30px; }
+        .chat { flex: 1; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .visualizer { flex: 1; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .message { margin: 10px 0; padding: 12px; border-radius: 10px; }
+        .tutor { background: #e3f2fd; border-left: 4px solid #2196f3; }
+        .student { background: #f3e5f5; border-left: 4px solid #9c27b0; }
+        .error { background: #ffebee; border-left: 4px solid #f44336; }
+        .success { background: #e8f5e8; border-left: 4px solid #4caf50; }
+        input { width: 70%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { padding: 12px 24px; background: #2196f3; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        button:hover { background: #1976d2; }
+        .array { display: flex; gap: 5px; justify-content: center; margin: 20px 0; font-weight: bold; font-size: 18px; }
+        .cell { width: 50px; height: 50px; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; border-radius: 5px; }
+        .active { background: #ffeb3b; border-color: #ffc107; }
+        .found { background: #4caf50; color: white; }
+        h1 { text-align: center; color: #333; }
+        .stage { font-weight: bold; color: #2196f3; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔬 Socratic DSA Tutor - Binary Search (Physics Paper Inspired)</h1>
+    <div class="container">
+        <div class="chat">
+            <h3>Chat Simulation (3-Probe Pattern)</h3>
+            <div id="chatLog"></div>
+            <div style="margin-top: 20px;">
+                <input type="text" id="userInput" placeholder="Type your binary search approach..." />
+                <button onclick="sendMessage()">Send</button>
+                <div style="margin-top: 10px; font-size: 14px; color: #666;">
+                    <strong>Physics Paper Pattern:</strong> Error → Probe → Relapse → Fix
+                </div>
+            </div>
+        </div>
+        <div class="visualizer">
+            <h3>Array Visualizer [1,3,5,7,9] Target=5</h3>
+            <div id="arrayVis" class="array">
+                <div class="cell" data-index="0">1</div>
+                <div class="cell" data-index="1">3</div>
+                <div class="cell" data-index="2">5</div>
+                <div class="cell" data-index="3">7</div>
+                <div class="cell" data-index="4">9</div>
+            </div>
+            <div id="steps"></div>
+            <div style="margin-top: 20px;">
+                <h4>Time Complexity:</h4>
+                <div id="complexity" style="font-size: 24px; font-weight: bold; color: #f44336;">O(n) Wrong!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stage = 0; // 0=initial, 1=probe1, 2=probe2, 3=success
+        const messages = [];
+        
+        function addMessage(text, type) {
+            messages.push({text, type});
+            const chatLog = document.getElementById('chatLog');
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${text}`;
+            chatLog.appendChild(msg);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+        
+        function tutorResponse() {
+            stage++;
+            const array = [1,3,5,7,9];
+            const target = 5;
+            
+            if (stage === 1) {
+                addMessage("❌ Wrong! If you only check right half, you eliminated just 2/5 elements (40%). Can we do better?", 'tutor error');
+                document.getElementById('steps').innerHTML = 'Step 1: Checked mid=5 ✓ But poor elimination!';
+            } 
+            else if (stage === 2) {
+                addMessage("❓ Good intuition! What's the TRUE pattern that eliminates half each time?", 'tutor');
+                highlightCell(2); // Target cell
+            }
+            else if (stage === 3) {
+                addMessage("🎉 PERFECT! Binary Search = O(log n). Here's optimized code:", 'success');
+                document.getElementById('complexity').innerHTML = 'O(log n) ✓';
+                document.getElementById('complexity').style.color = '#4caf50';
+                highlightFound(2);
+                document.getElementById('steps').innerHTML = `
+                    <div>1 comparison vs Linear's avg 3</div>
+                    <div>Physics paper's 3-probe → DSA mastery!</div>
+                `;
+            }
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            addMessage(text, 'student');
+            input.value = '';
+            
+            setTimeout(tutorResponse, 1000);
+        }
+        
+        function highlightCell(index) {
+            document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('active'));
+            document.querySelector(`[data-index="${index}"]`).classList.add('active');
+        }
+        
+        function highlightFound(index) {
+            document.querySelector(`[data-index="${index}"]`).classList.add('found');
+        }
+        
+        // Initial tutor message
+        addMessage("Demo array: [1,3,5,7,9] Find target=5. Describe your binary search approach.", 'tutor');
+        document.getElementById('steps').innerHTML = 'Physics Paper Pattern: Error → Probe → Success';
+    </script>
+</body>
+</html>
